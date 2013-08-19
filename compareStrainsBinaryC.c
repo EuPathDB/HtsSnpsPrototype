@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
-main() {
+main(int argc, char *argv[]) {
 	FILE *f1;
 	FILE *f2;
 
@@ -15,8 +15,21 @@ main() {
   char bp2;
   char *bp2p = &bp2;
 
-	f1 = fopen("sample1.bin", "rb");
-	f2 = fopen("sample2.bin", "rb");
+	if ( argc != 3 ) {
+		printf( "usage: %s file1 file2\n", argv[0] );
+		return -1;
+	}
+
+	f1 = fopen(argv[1], "rb");
+	if (f1 == 0) {
+		printf( "Can't open file1 '%s' \n", argv[1] );
+		return -1;
+	}
+	f2 = fopen(argv[1], "rb");
+	if (f2 == 0) {
+		printf( "Can't open file2 '%s' \n", argv[2] );
+		return -1;
+	}
 
 	int f1got;
 	int f2got;
