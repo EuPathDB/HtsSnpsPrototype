@@ -8,5 +8,6 @@ main() {
 
 	read(3, loc1p, 4);
 	read(4, loc2p, 4);
+	write(5, loc1p, 4);
   printf("%i %i\n",  loc1, loc2);
 }
