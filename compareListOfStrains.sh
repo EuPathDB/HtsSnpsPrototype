@@ -23,4 +23,8 @@ mkfifo f401
 ./mergeLocations f203 f204 > f302 &
 ./mergeLocations f301 f302 > f401 &
 ./mergeLocations f401 f205 > final &
+rm f100 f101 f102 f103 f104 f105 f106 f107 f108 f109
+rm f201 f202 f203 f204 f205
+rm f301 f302
+rm f401
 exit
