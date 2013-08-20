@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include <time.h>
 main(int argc, char *argv[]) {
 	FILE *f1;
 	FILE *f2;
@@ -14,6 +15,8 @@ main(int argc, char *argv[]) {
   int32_t *loc2p = &loc2;
   char bp2;
   char *bp2p = &bp2;
+	time_t now;
+  struct tm *current;
 
 	if ( argc != 3 ) {
 		printf( "usage: %s file1 file2\n", argv[0] );
@@ -25,7 +28,7 @@ main(int argc, char *argv[]) {
 		printf( "Can't open file1 '%s' \n", argv[1] );
 		return -1;
 	}
-	f2 = fopen(argv[1], "rb");
+	f2 = fopen(argv[2], "rb");
 	if (f2 == 0) {
 		printf( "Can't open file2 '%s' \n", argv[2] );
 		return -1;
@@ -58,5 +61,8 @@ main(int argc, char *argv[]) {
 		}
 		if (f1got == 0 && f2got ==0) break;
 	}
+	time(&now);
+	current = localtime(&now);
+	fprintf(stderr, "done: %i:%i:%i\n", current->tm_hour, current->tm_min, current->tm_sec);
 }
 
