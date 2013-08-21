@@ -38,15 +38,15 @@ main(int argc, char *argv[]) {
 
 	while(1 == 1) {
 		while (loc1 < loc2 && f1got != 0) { 
-			printf("%i\n",  loc1);
+			fwrite(loc1p, 4, 1, stdout);
 			f1got = fread(loc1p, 4, 1, f1);
 		}
-		while (loc1 > loc2 && f2got != 0) { 
-			printf("%i\n",  loc2);
+		while (loc1 > loc2 && f2got != 0) {
+			fwrite(loc2p, 4, 1, stdout); 
 			f2got = fread(loc2p, 4, 1, f2);
 		}
 		if (loc1 == loc2) {
-			printf("%i\n",  loc2);
+			fwrite(loc1p, 4, 1, stdout); 
 			f1got = fread(loc1p, 4, 1, f1);
 			f2got = fread(loc2p, 4, 1, f2);
 		}
@@ -58,8 +58,11 @@ main(int argc, char *argv[]) {
 		}
 		if (f1got == 0 && f2got ==0) break;
 	}
+	fclose(f1);
+	fclose(f2);
 	time(&now);
 	current = localtime(&now);
 	fprintf(stderr, "done: %i:%i:%i mergeLocations %s %s\n", current->tm_hour, current->tm_min, current->tm_sec, argv[1], argv[2]);
+	return 0;
 }
 

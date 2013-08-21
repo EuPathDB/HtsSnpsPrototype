@@ -24,5 +24,7 @@ main(int argc, char *argv[]) {
 		printf("%i\n",  loc1);
 		f1got = fread(loc1p, 4, 1, f1);
 	}
+	fclose(f1);
+	return 0;
 }
 
