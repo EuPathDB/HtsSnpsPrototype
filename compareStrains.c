@@ -24,13 +24,15 @@ main(int argc, char *argv[]) {
 	FILE *fp;
 	char buffer [50];
 	
+	/*
 	pid = getpid();
 	sprintf(buffer, "%i", pid);
 	fp = fopen(buffer, "w");
 	fprintf(fp, "start: compareStrains %s %s\n", argv[1], argv[2]);
 	fclose(fp);
+	*/
 
-	fprintf(stderr, "start: compareStrains %s %s\n", argv[1], argv[2]);
+	//	fprintf(stderr, "start: compareStrains %s %s\n", argv[1], argv[2]);
 
 	if ( argc != 3 ) {
 		printf( "usage: %s file1 file2\n", argv[0] );
@@ -78,11 +80,9 @@ main(int argc, char *argv[]) {
 	}
 	fclose(f1);
 	fclose(f2);
-	time(&now);
-	current = localtime(&now);
-	fprintf(stderr, "done: %i:%i:%i compareStrains %s %s\n", current->tm_hour, current->tm_min, current->tm_sec, argv[1], argv[2]);
-	//	fprintf(fp, "done: %i:%i:%i compareStrains %s %s\n", current->tm_hour, current->tm_min, current->tm_sec, argv[1], argv[2]);
-	// fclose(fp);
+	//	time(&now);
+	//  current = localtime(&now);
+	//	fprintf(stderr, "done: %i:%i:%i compareStrains %s %s\n", current->tm_hour, current->tm_min, current->tm_sec, argv[1], argv[2]);
 	return 0;
 }
 

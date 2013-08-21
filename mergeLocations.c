@@ -13,7 +13,7 @@ main(int argc, char *argv[]) {
 	time_t now;
   struct tm *current;
 
-	fprintf(stderr, "start: mergeLocations %s %s\n", argv[1], argv[2]);
+	//	fprintf(stderr, "start: mergeLocations %s %s\n", argv[1], argv[2]);
 
 	if ( argc != 3 ) {
 		printf( "usage: %s file1 file2\n", argv[0] );
@@ -60,9 +60,9 @@ main(int argc, char *argv[]) {
 	}
 	fclose(f1);
 	fclose(f2);
-	time(&now);
-	current = localtime(&now);
-	fprintf(stderr, "done: %i:%i:%i mergeLocations %s %s\n", current->tm_hour, current->tm_min, current->tm_sec, argv[1], argv[2]);
+	//	time(&now);
+	//  current = localtime(&now);
+	//	fprintf(stderr, "done: %i:%i:%i mergeLocations %s %s\n", current->tm_hour, current->tm_min, current->tm_sec, argv[1], argv[2]);
 	return 0;
 }
 
