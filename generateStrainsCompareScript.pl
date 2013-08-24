@@ -37,12 +37,12 @@ while(1) {
   my $fifo1 = "fifo" . pop(@mergeQueue);
   my $fifo2 = "fifo" . pop(@mergeQueue);
   if (scalar(@mergeQueue) == 0) {
-    print "./mergeLocations $fifo1 $fifo2 > $final &\n";
+    print "./unionLocations $fifo1 $fifo2 > $final &\n";
     last;
   } else {
     $fifoCursor++;
     push(@mergeQueue, $fifoCursor);
-    print "./mergeLocations $fifo1 $fifo2 > fifo$fifoCursor &\n";
+    print "./unionLocations $fifo1 $fifo2 > fifo$fifoCursor &\n";
   }
 }
 print "wait\n";
