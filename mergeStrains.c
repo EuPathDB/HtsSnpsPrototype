@@ -9,7 +9,7 @@ inline static int readStrainRow(FILE *file, int16_t *seq, int32_t *loc, int8_t *
 	fread(loc, 4, 1, file);  
 	fread(allele, 1, 1, file); 
 	int retval = fread(product, 1, 1, file);
-	if (cmdLineStrain == 0) retval = fread(strain, 1, 1, file);
+	if (cmdLineStrain == 0) retval = fread(strain, 2, 1, file);
 	else strain = &cmdLineStrain;
 	return retval;
 }

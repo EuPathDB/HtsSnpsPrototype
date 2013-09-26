@@ -7,7 +7,7 @@ inline static int readStrainRow(int16_t *seq, int32_t *loc, int8_t *allele, char
 	fread(loc, 4, 1, stdin);  
 	fread(allele, 1, 1, stdin); 
 	int retval = fread(product, 1, 1, stdin);
-	if (cmdLineStrain == 0) retval = fread(strain, 1, 1, stdin);
+	if (cmdLineStrain == 0) retval = fread(strain, 2, 1, stdin);
 	else strain = &cmdLineStrain;
 	return retval;
 }
@@ -42,7 +42,7 @@ main(int argc, char *argv[]) {
 	f1got = readStrainRow(seq1_p, loc1_p, a1_p, p1_p, strain1_p, cmdLineStrain1);
 
 	while(f1got != 0) {
-		printf("%i %i %i %i %i\n", seq1, loc1, a1, p1, cmdLineStrain1);
+		printf("%i\t%i\t%i\t%i\t%i\n", seq1, loc1, a1, p1, cmdLineStrain1);
 		f1got = readStrainRow(seq1_p, loc1_p, a1_p, p1_p, strain1_p, cmdLineStrain1);
 	}
 	return 0;
