@@ -1,34 +1,58 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
-#include <time.h>
+
+// input files that are unmerged strain files have a constant strain; the rows do not include strain.
+// in that case the strain is provided on the cmd line.  otherwise read the strain from the file.
+inline static int readStrainRow(FILE *file, int16_t *seq, int32_t *loc, int8_t *allele, char *product, int16_t *strain, int16_t cmdLineStrain) {
+	fread(seq, 2, 1, file);  
+	fread(loc, 4, 1, file);  
+	fread(allele, 1, 1, file); 
+	int retval = fread(product, 1, 1, file);
+	if (cmdLineStrain == 0) retval = fread(strain, 1, 1, file);
+	else strain = &cmdLineStrain;
+	return retval;
+}
+
+inline static int writeStrainRowAndReadNext(FILE *file, int16_t *seq, int32_t *loc, int8_t *allele, char *product, int16_t *strain, int16_t cmdLineStrain) {
+	fwrite(seq, 2, 1, stdout);  
+	fwrite(loc, 4, 1, stdout);  
+	fwrite(allele, 1, 1, stdout); 
+	fwrite(product, 1, 1, stdout);
+	fwrite(strain, 2, 1, stdout);
+	return readStrainRow(file, seq, loc, allele, product, strain, cmdLineStrain);
+}
+
 main(int argc, char *argv[]) {
 	FILE *f1;
 	FILE *f2;
-  int8_t *strain1;
-  int8_t *strain2;
+  int16_t cmdLineStrain1;
+  int16_t cmdLineStrain2;
 
-  int32_t id1;
-  int32_t *id1p = &id1;
+  int16_t seq1;
+  int16_t *seq1_p = &seq1;
+  int32_t loc1;
+  int32_t *loc1_p = &loc1;
   char a1;  // allele
-  char *a1p = &a1;
+  char *a1_p = &a1;
   char p1;  // product
-  char *p1p = &p1;
+  char *p1_p = &p1;
+  int16_t strain1;
+  int16_t *strain1_p = &strain1;
 
-  int32_t id2;
-  int32_t *id2p = &id2;
+  int16_t seq2;
+  int16_t *seq2_p = &seq2;
+  int32_t loc2;
+  int32_t *loc2_p = &loc2;
   char a2;  // allele
-  char *a2p = &a2;
+  char *a2_p = &a2;
   char p2;  // product
-  char *p2p = &p2;
+  char *p2_p = &p2;
+  int16_t strain2;
+  int16_t *strain2_p = &strain2;
 
-	time_t now;
-  struct tm *current;
-
-	//	fprintf(stderr, "start: unionLocations %s %s\n", argv[1], argv[2]);
-
-	if ( argc != 3 ) {
-		printf( "usage: %s file1 file2\n", argv[0] );
+	if ( argc != 5 ) {
+		printf( "usage: %s strain1_file strain1_id strain2_file strain2_id \n\nstrain1_id should be 0 if strain1_file includes strain info per row (and same for strain2\n", argv[0] );
 		return -1;
 	}
 
@@ -37,49 +61,38 @@ main(int argc, char *argv[]) {
 		printf( "Can't open file1 '%s' \n", argv[1] );
 		return -1;
 	}
-	f2 = fopen(argv[2], "rb");
+	cmdLineStrain1 = atoi(argv[2]);
+
+	f2 = fopen(argv[3], "rb");
 	if (f2 == 0) {
 		printf( "Can't open file2 '%s' \n", argv[2] );
 		return -1;
 	}
+	cmdLineStrain2 = atoi(argv[4]);
 
 	int f1got;
 	int f2got;
-	f1got = readStrainRow(f1, id1p, a1p, p1p);
-	f2got = readStrainRow(f2, id2p, a2p, p2p);
+	f1got = readStrainRow(f1, seq1_p, loc1_p, a1_p, p1_p, strain1_p, cmdLineStrain1);
+	f2got = readStrainRow(f2, seq2_p, loc2_p, a2_p, p2_p, strain2_p, cmdLineStrain2);
 
 	while(1 == 1) {
-		while (id1 < id2 && f1got != 0) { 
-			f1got = writeStrainRowAndReadNext(f1, id1p, a1p, p1p, strain1);
+		while ((seq1 < seq2 || (seq1 == seq2 && loc1 < loc2)) && f1got != 0) { 
+			f1got = writeStrainRowAndReadNext(f1, seq1_p, loc1_p, a1_p, p1_p, strain1_p, cmdLineStrain1);
 		}
-		while (id2 < id1 && f2got != 0) {
-			f2got = writeStrainRowAndReadNext(f2, id2p, a2p, p2p, strain2);
+		while ((seq2 < seq1 || (seq2 == seq1 && loc2 < loc1)) && f2got != 0) {
+			f2got = writeStrainRowAndReadNext(f2, seq2_p, loc2_p, a2_p, p2_p, strain2_p, cmdLineStrain2);
 		}
-		if (id1 == id2) {
-			f1got = writeStrainRowAndReadNext(f1, id1p, a1p, p1p, strain1);
-			f2got = writeStrainRowAndReadNext(f2, id2p, a2p, p2p, strain2);
+		if (seq1 == seq2 && loc1 == loc2) {
+			f1got = writeStrainRowAndReadNext(f1, seq1_p, loc1_p, a1_p, p1_p, strain1_p, cmdLineStrain1);
+			f2got = writeStrainRowAndReadNext(f2, seq2_p, loc2_p, a2_p, p2_p, strain2_p, cmdLineStrain2);
 		}
 		if (f1got == 0 && f2got ==0) break;
-		if (f1got == 0) f2got = writeStrainRowAndReadNext(f2, id2p, a2p, p2p, strain2);
-		if (f2got == 0) f1got = writeStrainRowAndReadNext(f1, id1p, a1p, p1p, strain1);
+		if (f1got == 0) f2got = writeStrainRowAndReadNext(f2, seq2_p, loc2_p, a2_p, p2_p, strain2_p, cmdLineStrain2);
+		if (f2got == 0) f1got = writeStrainRowAndReadNext(f1, seq1_p, loc1_p, a1_p, p1_p, strain1_p, cmdLineStrain1);
 	}
 	fclose(f1);
 	fclose(f2);
 	return 0;
-}
-
-int readStrainRow(FILE *file, int32_t *id, int8_t *allele, char *product) {
-	fread(id, 4, 1, file);  
-	fread(allele, 1, 1, file); 
-	return fread(product, 1, 1, file);
-}
-
-int writeStrainRowAndReadNext(FILE *file, int32_t *id, int8_t *allele, char *product, int8_t *strain) {
-	fwrite(id, 4, 1, stdout);  
-	fwrite(allele, 1, 1, stdout); 
-	fwrite(product, 1, 1, stdout);
-	fwrite(strain, 1, 1, stdout);
-	return readStrainRow(file, id, allele, product);
 }
 
 
