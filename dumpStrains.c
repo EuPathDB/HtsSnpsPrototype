@@ -42,7 +42,7 @@ main(int argc, char *argv[]) {
 	f1got = readStrainRow(seq1_p, loc1_p, a1_p, p1_p, strain1_p, cmdLineStrain1);
 
 	while(f1got != 0) {
-		printf("%i %i %i %i %i\n", seq1, loc1, a1, p1, strain1);
+		printf("%i %i %i %i %i\n", seq1, loc1, a1, p1, cmdLineStrain1);
 		f1got = readStrainRow(seq1_p, loc1_p, a1_p, p1_p, strain1_p, cmdLineStrain1);
 	}
 	return 0;
