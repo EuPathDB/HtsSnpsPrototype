@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+
+use strict;
+
+my ($cmdLineStrain) = @ARGV;
+
+usage() if !defined($cmdLineStrain);
+
+while(<STDIN>) {
+  chomp;
+  next if /^\s*$/;
+  my ($seq, $loc, $allele, $product, $strain) = split(/\t/);
+  $strain = $cmdLineStrain if $cmdLineStrain;
+  print STDOUT pack("slccs", $seq, $loc, $allele, $product, $strain);
+#  print STDERR join(",", $seq, $loc, $allele, $product, $strain) . "\n";
+}
+
+sub usage {
+  die "
+Usage: strainsTextToBinary strain_id < strains_file
+
+strain_id must be 0 if strains_file includes strain as a column
+";
+}
