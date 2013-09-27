@@ -83,8 +83,8 @@ main(int argc, char *argv[]) {
 			f2got = writeStrainRowAndReadNext(f2, seq2_p, loc2_p, a2_p, p2_p, strain2_p, cmdLineStrain2);
 		}
 		if (seq1 == seq2 && loc1 == loc2) {
-			f1got = writeStrainRowAndReadNext(f1, seq1_p, loc1_p, a1_p, p1_p, strain1_p, cmdLineStrain1);
-			f2got = writeStrainRowAndReadNext(f2, seq2_p, loc2_p, a2_p, p2_p, strain2_p, cmdLineStrain2);
+			if (f1got == 1) f1got = writeStrainRowAndReadNext(f1, seq1_p, loc1_p, a1_p, p1_p, strain1_p, cmdLineStrain1);
+			if (f2got == 1) f2got = writeStrainRowAndReadNext(f2, seq2_p, loc2_p, a2_p, p2_p, strain2_p, cmdLineStrain2);
 		}
 		if (f1got == 0 && f2got ==0) break;
 		if (f1got == 0) f2got = writeStrainRowAndReadNext(f2, seq2_p, loc2_p, a2_p, p2_p, strain2_p, cmdLineStrain2);
