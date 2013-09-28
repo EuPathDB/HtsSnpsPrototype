@@ -5,12 +5,13 @@
 // input files that are unmerged strain files have a constant strain; the rows do not include strain.
 // in that case the strain is provided on the cmd line.  otherwise read the strain from the file.
 inline static int readStrainRow(FILE *file, int16_t *seq, int32_t *loc, int8_t *allele, char *product, int16_t *strain, int16_t cmdLineStrain) {
+	int retval;
 	fread(seq, 2, 1, file);  
 	fread(loc, 4, 1, file);  
 	fread(allele, 1, 1, file); 
-	int retval = fread(product, 1, 1, file);
+	retval = fread(product, 1, 1, file);
 	if (cmdLineStrain == 0) retval = fread(strain, 2, 1, file);
-	else strain = &cmdLineStrain;
+	else *strain = cmdLineStrain;
 	return retval;
 }
 
@@ -77,18 +78,24 @@ main(int argc, char *argv[]) {
 
 	while(1 == 1) {
 		while ((seq1 < seq2 || (seq1 == seq2 && loc1 < loc2)) && f1got != 0) { 
+			//	f1got = writeStrainRowAndReadNext(f1, seq1_p, loc1_p, a1_p, p1_p, strain1_p, 11);
 			f1got = writeStrainRowAndReadNext(f1, seq1_p, loc1_p, a1_p, p1_p, strain1_p, cmdLineStrain1);
 		}
 		while ((seq2 < seq1 || (seq2 == seq1 && loc2 < loc1)) && f2got != 0) {
 			f2got = writeStrainRowAndReadNext(f2, seq2_p, loc2_p, a2_p, p2_p, strain2_p, cmdLineStrain2);
+			//f2got = writeStrainRowAndReadNext(f2, seq2_p, loc2_p, a2_p, p2_p, strain2_p, 21);
 		}
 		if (seq1 == seq2 && loc1 == loc2) {
-			if (f1got == 1) f1got = writeStrainRowAndReadNext(f1, seq1_p, loc1_p, a1_p, p1_p, strain1_p, cmdLineStrain1);
-			if (f2got == 1) f2got = writeStrainRowAndReadNext(f2, seq2_p, loc2_p, a2_p, p2_p, strain2_p, cmdLineStrain2);
+			if (f1got != 0) f1got = writeStrainRowAndReadNext(f1, seq1_p, loc1_p, a1_p, p1_p, strain1_p, cmdLineStrain1);
+			if (f2got != 0) f2got = writeStrainRowAndReadNext(f2, seq2_p, loc2_p, a2_p, p2_p, strain2_p, cmdLineStrain2);
+			//if (f1got == 1) f1got = writeStrainRowAndReadNext(f1, seq1_p, loc1_p, a1_p, p1_p, strain1_p, 12);
+			//if (f2got == 1) f2got = writeStrainRowAndReadNext(f2, seq2_p, loc2_p, a2_p, p2_p, strain2_p, 22);
 		}
-		if (f1got == 0 && f2got ==0) break;
-		if (f1got == 0) f2got = writeStrainRowAndReadNext(f2, seq2_p, loc2_p, a2_p, p2_p, strain2_p, cmdLineStrain2);
-		if (f2got == 0) f1got = writeStrainRowAndReadNext(f1, seq1_p, loc1_p, a1_p, p1_p, strain1_p, cmdLineStrain1);
+		if (f1got == 0 && f2got == 0) break;
+		if (f1got != 0) f1got = writeStrainRowAndReadNext(f1, seq1_p, loc1_p, a1_p, p1_p, strain1_p, cmdLineStrain1);
+		if (f2got != 0) f2got = writeStrainRowAndReadNext(f2, seq2_p, loc2_p, a2_p, p2_p, strain2_p, cmdLineStrain2);
+		//if (f1got == 0) f2got = writeStrainRowAndReadNext(f2, seq2_p, loc2_p, a2_p, p2_p, strain2_p, 23);
+		//if (f2got == 0) f1got = writeStrainRowAndReadNext(f1, seq1_p, loc1_p, a1_p, p1_p, strain1_p, 13);
 	}
 	fclose(f1);
 	fclose(f2);

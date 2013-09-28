@@ -31,18 +31,11 @@ main(int argc, char *argv[]) {
 	}
 	cmdLineStrain1 = atoi(argv[1]);
 
-	/*
-	f1 = fopen(argv[1], "rb");
-	if (f1 == 0) {
-		printf( "Can't open file '%s' \n", argv[1] );
-		return -1;
-	}
-	*/
 	int f1got;
 	f1got = readStrainRow(seq1_p, loc1_p, a1_p, p1_p, strain1_p, cmdLineStrain1);
 
 	while(f1got != 0) {
-		printf("%i\t%i\t%i\t%i\t%i\n", seq1, loc1, a1, p1, cmdLineStrain1);
+		printf("%i\t%i\t%i\t%i\t%i\n", seq1, loc1, a1, p1, strain1);
 		f1got = readStrainRow(seq1_p, loc1_p, a1_p, p1_p, strain1_p, cmdLineStrain1);
 	}
 	return 0;
