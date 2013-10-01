@@ -8,7 +8,7 @@ inline static int readStrainRow(int16_t *seq, int32_t *loc, int8_t *allele, char
 	fread(allele, 1, 1, stdin); 
 	int retval = fread(product, 1, 1, stdin);
 	if (cmdLineStrain == 0) retval = fread(strain, 2, 1, stdin);
-	else strain = &cmdLineStrain;
+	else *strain = cmdLineStrain;
 	return retval;
 }
 

@@ -46,11 +46,10 @@ static inline int readStrainRow() {
 	fread(loc1_p, 4, 1, f1);  
 	fread(a1_p, 1, 1, f1); 
 	fread(p1_p, 1, 1, f1);
-	return fread(s1_p, 1, 1, f1);
+	return fread(s1_p, 2, 1, f1);
 }
 
 static inline getRefGenomeInfo(int16_t seq, int32_t loc) {
-
 	// refGenome file is a strain file: one row per SNP, showing the ref genomes values
 	// advance through SNPs to our current one
 	while(refSeq != seq && refLoc != loc) {
@@ -77,21 +76,22 @@ main(int argc, char *argv[]) {
 		return -1;
 	}
 
-	f2 = fopen(argv[1], "rb");
+	f2 = fopen(argv[2], "rb");
 	if (f2 == 0) {
 		printf( "Can't open refGenomeFile '%s' \n", argv[2] );
 		return -1;
 	}
 
 	int f1got;
-	int prevSeq;
-	int prevLoc;
+	int16_t prevSeq;
+	int32_t prevLoc;
 
 	// prime things by reading, but not processing, first SNP in the input
 	f1got = readStrainRow();
 	prevSeq = seq1;
 	prevLoc = loc1;
 	prevProduct = p1;
+
 	while (seq1 == prevSeq && loc1 == prevLoc && f1got != 0) {
 		if (a1 == 1) a_count++;
 		else if (a1 == 2) c_count++;
@@ -107,7 +107,8 @@ main(int argc, char *argv[]) {
 	while(f1got != 0) {
 
 		// first process prev SNP and clear counts
-		if (seq1 != prevSeq && loc1 != prevLoc) processPreviousSnp();
+
+		if (seq1 != prevSeq && loc1 != prevLoc) processPreviousSnp(prevSeq, prevLoc);
 
 		// update counts with this variant
 		if (a1 == 1) a_count++;
@@ -126,7 +127,7 @@ main(int argc, char *argv[]) {
 		// read next variant
 		f1got = readStrainRow();
 	}	
-	processPreviousSnp(); // process final snp
+	processPreviousSnp(prevSeq, prevLoc); // process final snp
 
 	fclose(f1);
 	fclose(f2);
@@ -137,13 +138,13 @@ main(int argc, char *argv[]) {
  * Look at the data accumulated for a SNP.  If above threshold write it out.
  * As part of this, read the refGenome file to convert absent variants to ref genome values.
  */
-processPreviousSnp() {
+processPreviousSnp(int32_t prevSeq, int32_t prevLoc) {
 
 	// only consider SNPs that are under unknowns threshold
 	if (U_count <= unknownsThreshold) {
 
 		// get reference genome allele and product for this SNP
-		getRefGenomeInfo(seq1, loc1);
+		getRefGenomeInfo(prevSeq, prevLoc);
 		int ref_count = strainCount - sumCount; // sum_count includes unknowns
 
 		if (ref_count > 0 && refProduct != prevProduct) nonSyn = 1;  // we saw some ref alleles, might have a second product
@@ -158,8 +159,10 @@ processPreviousSnp() {
 
 		// write it out if has enough polymorphisms
 		int polyMorphisms = strainCount - U_count - *majorCount;
+		fprintf(stderr, "pPS %i %i %i\n", U_count, sumCount, *majorCount);
+
 		if (polyMorphisms >= polymorphismThreshold) {
-			printf("%i\t%i\t%i\t%i\t%i\n", seq1, loc1, U_count, polyMorphisms, nonSyn);
+			printf("%i\t%i\t%i\t%i\t%i\n", prevSeq, prevLoc, U_count, polyMorphisms, nonSyn);
 		}
 	}
 
