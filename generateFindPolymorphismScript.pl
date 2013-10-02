@@ -25,7 +25,9 @@ my @mergeQueue = sort {$a <=> $b} @mergeQueueOriginal;
 my $fifoCursor = 0;
 
 print "set -e\n";
+print "set -x\n";
 print "date\n";
+print "cd $strainsDir\n";
 print "mkfifo ";
 for (my $i = 1; $i <= scalar(@mergeQueueOriginal); $i++) {
   print "fifo$i ";
@@ -35,7 +37,7 @@ print "\n";
 while(1) {
   if (scalar(@mergeQueue) == 1) {
     my $allMerged = shift(@mergeQueue);
-    print "./findPolymorphic $allMerged referenceGenome.dat $strainsCount $polymorphismThreshold $unknownThreshold > $final &\n";
+    print "findPolymorphic $allMerged referenceGenome.dat $strainsCount $polymorphismThreshold $unknownThreshold > $final &\n";
     last;
   } else {
     my $input1 = shift(@mergeQueue);
@@ -44,7 +46,7 @@ while(1) {
     push(@mergeQueue, "fifo$fifoCursor");
     my $strain1 = $input1 =~ /^\d+/? $input1 : 0;
     my $strain2 = $input2 =~ /^\d+/? $input2 : 0;
-    print "./mergeStrains $input1 $strain1 $input2 $strain2 > fifo$fifoCursor &\n";
+    print "mergeStrains $input1 $strain1 $input2 $strain2 > fifo$fifoCursor &\n";
   }
 }
 print "wait\n";
