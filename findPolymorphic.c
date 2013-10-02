@@ -107,8 +107,8 @@ main(int argc, char *argv[]) {
 	while(f1got != 0) {
 
 		// first process prev SNP and clear counts
-
-		if (seq1 != prevSeq && loc1 != prevLoc) processPreviousSnp(prevSeq, prevLoc);
+		//fprintf(stderr, "%i %i %i %i\n", seq1, prevSeq, loc1, prevLoc);
+		if (seq1 != prevSeq || loc1 != prevLoc) processPreviousSnp(prevSeq, prevLoc);
 
 		// update counts with this variant
 		if (a1 == 1) a_count++;
@@ -139,7 +139,6 @@ main(int argc, char *argv[]) {
  * As part of this, read the refGenome file to convert absent variants to ref genome values.
  */
 processPreviousSnp(int32_t prevSeq, int32_t prevLoc) {
-	fprintf(stderr,".");
 
 	// only consider SNPs that are under unknowns threshold
 	if (U_count <= unknownsThreshold) {
