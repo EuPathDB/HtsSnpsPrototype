@@ -63,7 +63,7 @@ static inline getRefGenomeInfo(int16_t seq, int32_t loc) {
 main(int argc, char *argv[]) {
 
 	if ( argc != 6 ) {
-		printf( "usage: %s mergedStrainFiles refGenomeFile strainCount polymorphismThreshold unknownsTrheshold\n", argv[0] );
+		fprintf(stderr,"usage: %s mergedStrainFiles refGenomeFile strainCount polymorphismThreshold unknownsTrheshold\n", argv[0] );
 		return -1;
 	}
 	strainCount = atoi(argv[3]);
@@ -72,13 +72,13 @@ main(int argc, char *argv[]) {
 
 	f1 = fopen(argv[1], "rb");
 	if (f1 == 0) {
-		printf( "Can't open strainFile '%s' \n", argv[1] );
+		fprintf(stderr, "Can't open strainFile '%s' \n", argv[1] );
 		return -1;
 	}
 
 	f2 = fopen(argv[2], "rb");
 	if (f2 == 0) {
-		printf( "Can't open refGenomeFile '%s' \n", argv[2] );
+		fprintf(stderr,  "Can't open refGenomeFile '%s' \n", argv[2] );
 		return -1;
 	}
 
@@ -139,6 +139,7 @@ main(int argc, char *argv[]) {
  * As part of this, read the refGenome file to convert absent variants to ref genome values.
  */
 processPreviousSnp(int32_t prevSeq, int32_t prevLoc) {
+	fprintf(stderr,".");
 
 	// only consider SNPs that are under unknowns threshold
 	if (U_count <= unknownsThreshold) {
