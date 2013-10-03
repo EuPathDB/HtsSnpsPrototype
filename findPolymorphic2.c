@@ -60,6 +60,21 @@ static inline getRefGenomeInfo(int16_t seq, int32_t loc) {
 	}
 }
 
+static inline updateCounts() {
+	if (a1 == 0 && p1 == -1) {
+		U_count += strain1;
+		sumCount += strain1;
+	} else {
+		if (a1 == 1) a_count++;
+		else if (a1 == 2) c_count++;
+		else if (a1 == 3) g_count++;
+		else if (a1 == 4) t_count++;
+		else U_count++;
+		sumCount++;
+	}
+	if (p1 != prevProduct && p1 > 0 && prevProduct > 0) nonSyn = 1;
+}
+
 main(int argc, char *argv[]) {
 
 	if ( argc != 6 ) {
@@ -93,13 +108,7 @@ main(int argc, char *argv[]) {
 	if (p1 > 0) prevProduct = p1;
 
 	while (seq1 == prevSeq && loc1 == prevLoc && f1got != 0) {
-		if (a1 == 1) a_count++;
-		else if (a1 == 2) c_count++;
-		else if (a1 == 3) g_count++;
-		else if (a1 == 4) t_count++;
-		else U_count++;
-		sumCount++;
-		if (p1 != prevProduct && p1 > 0 && prevProduct > 0) nonSyn = 1;
+		updateCounts();
 		f1got = readStrainRow();		
 	}
 
@@ -111,18 +120,7 @@ main(int argc, char *argv[]) {
 		if (seq1 != prevSeq || loc1 != prevLoc) processPreviousSnp(prevSeq, prevLoc);
 
 		// update counts with this variant
-		if (a1 == 0 && p1 == -1) {
-			U_count += strain1;
-			sumCount += strain1;
-		} else {
-			if (a1 == 1) a_count++;
-			else if (a1 == 2) c_count++;
-			else if (a1 == 3) g_count++;
-			else if (a1 == 4) t_count++;
-			else U_count++;
-			sumCount++;
-		}
-		if (p1 != prevProduct && p1 > 0 && prevProduct > 0) nonSyn = 1; 
+		updateCounts();
 
 		// remember this variant as previous
 		prevSeq = seq1;
