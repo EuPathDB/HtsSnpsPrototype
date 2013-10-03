@@ -19,8 +19,8 @@ char a1;  // allele
 char *a1_p = &a1;
 char p1;  // product
 char *p1_p = &p1;
-int8_t s1;  // strain
-int8_t *s1_p = &s1;
+int8_t strain1;  
+int8_t *strain1_p = &strain1;
 
 // reference genome
 int16_t refSeq = 0;
@@ -39,14 +39,14 @@ int t_count = 0;
 int U_count = 0; // unknown
 int sumCount = 0;
 int prevProduct;
-int nonSyn;
+int nonSyn = 0;
 
 static inline int readStrainRow() {
 	fread(seq1_p, 2, 1, f1);  
 	fread(loc1_p, 4, 1, f1);  
 	fread(a1_p, 1, 1, f1); 
 	fread(p1_p, 1, 1, f1);
-	return fread(s1_p, 2, 1, f1);
+	return fread(strain1_p, 2, 1, f1);
 }
 
 static inline getRefGenomeInfo(int16_t seq, int32_t loc) {
@@ -90,7 +90,7 @@ main(int argc, char *argv[]) {
 	f1got = readStrainRow();
 	prevSeq = seq1;
 	prevLoc = loc1;
-	prevProduct = p1;
+	if (p1 > 0) prevProduct = p1;
 
 	while (seq1 == prevSeq && loc1 == prevLoc && f1got != 0) {
 		if (a1 == 1) a_count++;
@@ -99,7 +99,7 @@ main(int argc, char *argv[]) {
 		else if (a1 == 4) t_count++;
 		else U_count++;
 		sumCount++;
-		if (p1 != prevProduct) nonSyn = 1;
+		if (p1 != prevProduct && p1 > 0 && prevProduct > 0) nonSyn = 1;
 		f1got = readStrainRow();		
 	}
 
@@ -111,18 +111,23 @@ main(int argc, char *argv[]) {
 		if (seq1 != prevSeq || loc1 != prevLoc) processPreviousSnp(prevSeq, prevLoc);
 
 		// update counts with this variant
-		if (a1 == 1) a_count++;
-		else if (a1 == 2) c_count++;
-		else if (a1 == 3) g_count++;
-		else if (a1 == 4) t_count++;
-		else U_count++;
-		sumCount++;
-		if (p1 != prevProduct) nonSyn = 1; 
+		if (a1 == 0 && p1 == -1) {
+			U_count += strain1;
+			sumCount += strain1;
+		} else {
+			if (a1 == 1) a_count++;
+			else if (a1 == 2) c_count++;
+			else if (a1 == 3) g_count++;
+			else if (a1 == 4) t_count++;
+			else U_count++;
+			sumCount++;
+		}
+		if (p1 != prevProduct && p1 > 0 && prevProduct > 0) nonSyn = 1; 
 
 		// remember this variant as previous
 		prevSeq = seq1;
 		prevLoc = loc1;
-		prevProduct = p1;
+		if (prevProduct > 0) prevProduct = p1;
 
 		// read next variant
 		f1got = readStrainRow();
@@ -147,7 +152,7 @@ processPreviousSnp(int32_t prevSeq, int32_t prevLoc) {
 		getRefGenomeInfo(prevSeq, prevLoc);
 		int ref_count = strainCount - sumCount; // sum_count includes unknowns
 
-		if (ref_count > 0 && refProduct != prevProduct) nonSyn = 1;  // we saw some ref alleles, might have a second product
+		if (ref_count > 0 && refProduct != prevProduct && prevProduct > 0) nonSyn = 1;  // we saw some ref alleles, might have a second product
 
 		// find major allele
 		int *majorCount;

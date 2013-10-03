@@ -6,6 +6,7 @@ int16_t unknownCount =0;
 int16_t prevSeq = -1;
 int32_t prevLoc = -1;
 int8_t zero = 0;
+int8_t minusOne = -1;
 
 // input files that are unmerged strain files have a constant strain; the rows do not include strain.
 // in that case the strain is provided on the cmd line.  otherwise read the strain from the file.
@@ -27,7 +28,7 @@ inline static int writeStrainRowAndReadNext(FILE *file, int16_t *seq, int32_t *l
 			fwrite(&prevSeq, 2, 1, stdout);  
 			fwrite(&prevLoc, 4, 1, stdout);  
 			fwrite(&zero, 1, 1, stdout); 
-			fwrite(&zero, 1, 1, stdout);
+			fwrite(&minusOne, 1, 1, stdout);
 			fwrite(&unknownCount, 2, 1, stdout);
 		}
 		prevSeq = *seq;
@@ -41,7 +42,10 @@ inline static int writeStrainRowAndReadNext(FILE *file, int16_t *seq, int32_t *l
 		fwrite(allele, 1, 1, stdout); 
 		fwrite(product, 1, 1, stdout);
 		fwrite(strain, 2, 1, stdout);
-	} else unknownCount++;
+	} else {
+		if (*product == minusOne) unknownCount += *strain;
+		else unknownCount++;
+	}
 	return readStrainRow(file, seq, loc, allele, product, strain, cmdLineStrain);
 }
 

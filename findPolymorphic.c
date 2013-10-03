@@ -90,7 +90,7 @@ main(int argc, char *argv[]) {
 	f1got = readStrainRow();
 	prevSeq = seq1;
 	prevLoc = loc1;
-	prevProduct = p1;
+	if (p1 > 0) prevProduct = p1;
 
 	while (seq1 == prevSeq && loc1 == prevLoc && f1got != 0) {
 		if (a1 == 1) a_count++;
@@ -99,7 +99,7 @@ main(int argc, char *argv[]) {
 		else if (a1 == 4) t_count++;
 		else U_count++;
 		sumCount++;
-		if (p1 != prevProduct) nonSyn = 1;
+		if (p1 != prevProduct && p1 > 0) nonSyn = 1;
 		f1got = readStrainRow();		
 	}
 
@@ -117,12 +117,12 @@ main(int argc, char *argv[]) {
 		else if (a1 == 4) t_count++;
 		else U_count++;
 		sumCount++;
-		if (p1 != prevProduct) nonSyn = 1; 
+		if (p1 != prevProduct && p1 > 0) nonSyn = 1; 
 
 		// remember this variant as previous
 		prevSeq = seq1;
 		prevLoc = loc1;
-		prevProduct = p1;
+		if (prevProduct > 0) prevProduct = p1;
 
 		// read next variant
 		f1got = readStrainRow();
@@ -147,7 +147,7 @@ processPreviousSnp(int32_t prevSeq, int32_t prevLoc) {
 		getRefGenomeInfo(prevSeq, prevLoc);
 		int ref_count = strainCount - sumCount; // sum_count includes unknowns
 
-		if (ref_count > 0 && refProduct != prevProduct) nonSyn = 1;  // we saw some ref alleles, might have a second product
+		if (ref_count > 0 && refProduct != prevProduct && prevProduct > 0) nonSyn = 1;  // we saw some ref alleles, might have a second product
 
 		// find major allele
 		int *majorCount;
