@@ -20,7 +20,7 @@ foreach my $strainFile (readdir($dh)) {
 }
 closedir $dh;
 
-my @mergeQueue = sort {$a <=> $b} @mergeQueueOriginal;
+my @mergeQueue = sort {-s "$strainsDir/$b" <=> -s "$strainsDir/$a"} @mergeQueueOriginal;
 
 my $fifoCursor = 0;
 
