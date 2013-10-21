@@ -89,7 +89,7 @@ main(int argc, char *argv[]) {
 		}
 		if (f1got == 0 && f2got == 0) break;
 		if (f2got == 0) f1got = writeStrainRowAndReadNext(f1, seq1_p, loc1_p, a1_p, p1_p, strain1_p, cmdLineStrain1);
-		if (f1got == 0) f2got = writeStrainRowAndReadNext(f2, seq2_p, loc2_p, a2_p, p2_p, strain2_p, cmdLineStrain2);
+		else f2got = writeStrainRowAndReadNext(f2, seq2_p, loc2_p, a2_p, p2_p, strain2_p, cmdLineStrain2);
 	}
 	fclose(f1);
 	fclose(f2);
